@@ -18,16 +18,16 @@ csv_file = "data/stock_data.csv"
 # -------------------------------
 # Fetch stock data
 # -------------------------------
-all_data = []
+new_data_list = []
 for stock in STOCKS:
     ticker = yf.Ticker(stock)
-    data = ticker.history(period="1d")  # today's data
+    data = ticker.history(period="1d")
     if not data.empty:
         close_price = data["Close"].iloc[-1]
         open_price = data["Open"].iloc[-1]
         change_percent = ((close_price - open_price) / open_price) * 100
 
-        all_data.append({
+        new_data_list.append({
             "Stock": stock,
             "Date": datetime.now().strftime("%Y-%m-%d"),
             "Open": round(open_price, 2),
@@ -49,15 +49,28 @@ for stock in STOCKS:
         plt.close()
 
 # -------------------------------
-# Save CSV (append new data)
+# Save CSV (append or update new data)
 # -------------------------------
 if os.path.exists(csv_file):
-    old_df = pd.read_csv(csv_file)
-    new_df = pd.DataFrame(all_data)
-    final_df = pd.concat([old_df, new_df], ignore_index=True)
+    df = pd.read_csv(csv_file)
 else:
-    final_df = pd.DataFrame(all_data)
+    df = pd.DataFrame(columns=["Stock", "Date", "Open", "Close", "Change (%)"])
 
-final_df.to_csv(csv_file, index=False)
+new_df = pd.DataFrame(new_data_list)
+current_date_str = datetime.now().strftime("%Y-%m-%d")
+
+for index, row in new_df.iterrows():
+    stock_ticker = row['Stock']
+    existing_row_index = df[(df['Stock'] == stock_ticker) & (df['Date'] == current_date_str)].index
+    if not existing_row_index.empty:
+        # Update existing row
+        df.loc[existing_row_index, 'Open'] = row['Open']
+        df.loc[existing_row_index, 'Close'] = row['Close']
+        df.loc[existing_row_index, 'Change (%)'] = row['Change (%)']
+    else:
+        # Append new row
+        df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+
+df.to_csv(csv_file, index=False)
 
 print("✅ Stock data updated successfully!")
