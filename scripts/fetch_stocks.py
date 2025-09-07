@@ -19,6 +19,9 @@ csv_file = "data/stock_data.csv"
 # Fetch stock data
 # -------------------------------
 new_data_list = []
+current_time = datetime.now().strftime("%H:%M:%S")
+current_date = datetime.now().strftime("%Y-%m-%d")
+
 for stock in STOCKS:
     ticker = yf.Ticker(stock)
     data = ticker.history(period="1d")
@@ -29,7 +32,8 @@ for stock in STOCKS:
 
         new_data_list.append({
             "Stock": stock,
-            "Date": datetime.now().strftime("%Y-%m-%d"),
+            "Date": current_date,
+            "Time": current_time,
             "Open": round(open_price, 2),
             "Close": round(close_price, 2),
             "Change (%)": round(change_percent, 2)
@@ -45,32 +49,20 @@ for stock in STOCKS:
         plt.legend()
         plt.grid(True)
         plt.tight_layout()
-        plt.savefig(f"data/plots/{stock}_{datetime.now().strftime('%Y-%m-%d')}.png")
+        plt.savefig(f"data/plots/{stock}_{current_date}.png")
         plt.close()
 
 # -------------------------------
-# Save CSV (append or update new data)
+# Save CSV (append new data)
 # -------------------------------
 if os.path.exists(csv_file):
     df = pd.read_csv(csv_file)
 else:
-    df = pd.DataFrame(columns=["Stock", "Date", "Open", "Close", "Change (%)"])
+    df = pd.DataFrame(columns=["Stock", "Date", "Time", "Open", "Close", "Change (%)"])
 
 new_df = pd.DataFrame(new_data_list)
-current_date_str = datetime.now().strftime("%Y-%m-%d")
+final_df = pd.concat([df, new_df], ignore_index=True)
 
-for index, row in new_df.iterrows():
-    stock_ticker = row['Stock']
-    existing_row_index = df[(df['Stock'] == stock_ticker) & (df['Date'] == current_date_str)].index
-    if not existing_row_index.empty:
-        # Update existing row
-        df.loc[existing_row_index, 'Open'] = row['Open']
-        df.loc[existing_row_index, 'Close'] = row['Close']
-        df.loc[existing_row_index, 'Change (%)'] = row['Change (%)']
-    else:
-        # Append new row
-        df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
-
-df.to_csv(csv_file, index=False)
+final_df.to_csv(csv_file, index=False)
 
 print("✅ Stock data updated successfully!")
