@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # -------------------------------
 # Configurable: List of stock tickers and their categories
@@ -41,7 +41,11 @@ csv_file = "data/stock_data.csv"
 # Fetch stock data
 # -------------------------------
 new_data_list = []
-current_time = datetime.now().strftime("%H:%M:%S")
+# Get current UTC time and convert to IST
+utc_time = datetime.utcnow()
+ist_time = utc_time + timedelta(hours=5, minutes=30)
+current_time = ist_time.strftime("%H:%M:%S")
+
 current_date = datetime.now().strftime("%Y-%m-%d")
 
 for stock in STOCKS:
