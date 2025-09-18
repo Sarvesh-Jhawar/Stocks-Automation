@@ -2,7 +2,8 @@ name: Daily Stock Update
 
 on:
   schedule:
-    - cron: "*/5 * * * *"  # Runs every 5 minutes for testing
+    - cron: "40 03 * * *"  # Runs every day at 03:40 UTC (9:10 AM IST)
+    - cron: "15 10 * * *"  # Runs every day at 10:15 UTC (3:45 PM IST)
   workflow_dispatch:
 
 jobs:
