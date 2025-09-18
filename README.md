@@ -11,11 +11,9 @@ This repository contains an automated script that fetches and tracks the latest 
 
 ### Tracked Stocks
 The automation script currently tracks the following stocks:
-* AAPL (Apple Inc.)
-* TSLA (Tesla, Inc.)
-* MSFT (Microsoft Corporation)
-* RELIANCE.NS (Reliance Industries Limited)
-* TCS.NS (Tata Consultancy Services)
+* **Large Cap**: `RELIANCE.NS`, `TCS.NS`, `INFY.NS`, `SBIN.NS`, `AXISBANK.NS`, `KOTAKBANK.NS`
+* **Mid Cap**: `HINDZINC.NS`, `SOLARINDS.NS`, `MAZDOCK.NS`, `HDFCAMC.NS`, `MAXHEALTH.NS`, `CUMMINSIND.NS`
+* **Small Cap**: `OSWALPUMPS.NS`, `SWARAJENG.NS`, `LAURUSLABS.NS`, `KAYNES.NS`, `DENTALKART.NS`, `GCSL.NS`
 
 ### How It Works
 

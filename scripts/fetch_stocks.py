@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # -------------------------------
 # Configurable: List of stock tickers and their categories
@@ -42,11 +42,11 @@ csv_file = "data/stock_data.csv"
 # -------------------------------
 new_data_list = []
 # Get current UTC time and convert to IST
-utc_time = datetime.utcnow()
+utc_time = datetime.now(timezone.utc)
 ist_time = utc_time + timedelta(hours=5, minutes=30)
 current_time = ist_time.strftime("%H:%M:%S")
 
-current_date = datetime.now().strftime("%Y-%m-%d")
+current_date = ist_time.strftime("%Y-%m-%d") # Use IST time for date consistency
 
 for stock in STOCKS:
     ticker = yf.Ticker(stock)
@@ -84,24 +84,19 @@ for stock in STOCKS:
 # -------------------------------
 # Define the columns for the CSV file
 columns = ["Stock", "Date", "Time", "Open", "Close", "Change (%)", "Market Cap"]
-
 # Read existing data or create a new DataFrame
 if os.path.exists(csv_file):
-    df = pd.read_csv(csv_file)
+    try:
+        df = pd.read_csv(csv_file)
+    except pd.errors.EmptyDataError:
+        # If the file exists but is empty, initialize an empty DataFrame with columns
+        print(f"Warning: {csv_file} exists but is empty. Initializing a new DataFrame.")
+        df = pd.DataFrame(columns=columns)
 else:
     df = pd.DataFrame(columns=columns)
-
 new_df = pd.DataFrame(new_data_list)
 final_df = pd.concat([df, new_df], ignore_index=True)
-
 # Ensure the columns are in the correct order before saving
 final_df = final_df[columns]
-
 final_df.to_csv(csv_file, index=False)
-
-print("✅ Stock data updated successfully!")
-final_df = pd.concat([df, new_df], ignore_index=True)
-
-final_df.to_csv(csv_file, index=False)
-
 print("✅ Stock data updated successfully!")
